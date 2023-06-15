@@ -155,3 +155,12 @@ ll -h /usr/local/lib/libcurl.so.4.8.0
 ll -h src/.libs/curl
 -rwxrwxrwx 1 root root 299K Jun 15 14:05 src/.libs/curl*
 ```
+
+- 测试
+```bash
+./src/.libs/curl --http3 https://www.facebook.com/ -v -o /dev/null
+./src/.libs/curl --http3 https://www.google.com -v -o /dev/null
+./src/.libs/curl --http3 https://blog.cloudflare.com/ -v -o /dev/null
+./src/.libs/curl --http3 https://cloudflare-quic.com/ -v -o /dev/null
+./src/.libs/curl --http3 https://http2.akamai.com/demo -v -o /dev/null
+```
