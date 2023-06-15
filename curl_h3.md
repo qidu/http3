@@ -20,6 +20,8 @@ git branch -a
 ```
 
 - 编译
+
+编openssl
 ```bash
 cd openssl
 sudo ./config enable-tls1_3 --prefix=/usr/local/include/openssl
@@ -37,6 +39,7 @@ lrwxrwxrwx 1 root root    5 Jun 15 13:51 lib -> lib64/
 drwxr-xr-x 5 root root 4096 Jun 15 13:47 lib64/
 ```
 
+编nghttp3
 ```bash
 cd nghttp3
 sudo autoreconf -i
@@ -53,7 +56,7 @@ drwxr-xr-x 3 root root 4.0K Jun 13 12:35 include/
 drwxr-xr-x 3 root root 4.0K Jun 15 11:10 lib/
 drwxr-xr-x 3 root root 4.0K Jun 13 12:35 share/
 ```
-
+编ngtcp2
 ```bash
 cd ngtcp2
 sudo autoreconf -i
@@ -70,6 +73,7 @@ drwxr-xr-x 4 root root 4.0K Jun 13 13:45 include/
 drwxr-xr-x 3 root root 4.0K Jun 15 14:02 lib/
 drwxr-xr-x 3 root root 4.0K Jun 13 12:24 share/
 
+# 注意_openssl*相关的库
 ll -h /usr/local/include/ngtcp2/lib/
 total 4.1M
 drwxr-xr-x 3 root root 4.0K Jun 15 14:02 ./
@@ -87,6 +91,7 @@ lrwxrwxrwx 1 root root   33 Jun 15 14:02 libngtcp2_crypto_openssl.so.5 -> libngt
 drwxr-xr-x 2 root root 4.0K Jun 15 14:02 pkgconfig/
 ```
 
+编译libcurl 和 curl
 ```bash
 echo $LD_LIBRARY_PATH
 /usr/local/lib:/usr/local/include/openssl/lib64
@@ -97,6 +102,7 @@ sudo autoreconf -fi
 LDFLAGS="-Wl,-rpath,/usr/local/include/openssl/lib64:/usr/local/include/nghttp3/lib:/usr/local/include/ngtcp2/lib" sudo -E ./configure --with-openssl=/usr/local/include/openssl --with-nghttp3=/usr/local/include/nghttp3 --with-ngtcp2=/usr/local/include/ngtcp2
 sudo -E make -j4
 
+# 安装库libcurl
 cd lib
 sudo make install
 
