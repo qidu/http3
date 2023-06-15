@@ -163,4 +163,6 @@ ll -h src/.libs/curl
 ./src/.libs/curl --http3 https://blog.cloudflare.com/ -v -o /dev/null
 ./src/.libs/curl --http3 https://cloudflare-quic.com/ -v -o /dev/null
 ./src/.libs/curl --http3 https://http2.akamai.com/demo -v -o /dev/null
+./src/.libs/curl --http3 https://www.taobao.com -v -o /dev/null
+
 ```
