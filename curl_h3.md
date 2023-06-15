@@ -130,3 +130,28 @@ ldd src/.libs/curl
         /lib64/ld-linux-x86-64.so.2 (0x00007f7e0d4a5000)
         
 ```
+
+- 包大小
+```bash
+# libnghttp3 + libngtcp2 + libngtcp_* = 2 MB
+ll /usr/local/include/nghttp3/lib/libnghttp3.so.7.0.0
+-rwxr-xr-x 1 root root 603K Jun 15 11:10 /usr/local/include/nghttp3/lib/libnghttp3.so.7.0.0*
+
+ll -h /usr/local/include/ngtcp2/lib/libngtcp2_crypto_openssl.so.5.0.0
+-rwxr-xr-x 1 root root 128K Jun 15 14:02 /usr/local/include/ngtcp2/lib/libngtcp2_crypto_openssl.so.5.0.0*
+
+ll -h /usr/local/include/ngtcp2/lib/libngtcp2.so.13.0.0
+-rwxr-xr-x 1 root root 1.3M Jun 15 14:02 /usr/local/include/ngtcp2/lib/libngtcp2.so.13.0.0*
+
+ll -h /usr/local/include/openssl/lib64/libssl.so.81.3
+-rwxr-xr-x 1 root root 814K Jun 15 13:47 /usr/local/include/openssl/lib64/libssl.so.81.3*
+
+ll -h /usr/local/include/openssl/lib64/libcrypto.so.81.3
+-rwxr-xr-x 1 root root 5.2M Jun 15 13:47 /usr/local/include/openssl/lib64/libcrypto.so.81.3*
+
+ll -h /usr/local/lib/libcurl.so.4.8.0
+-rwxr-xr-x 1 root root 732K Jun 15 14:07 /usr/local/lib/libcurl.so.4.8.0*
+
+ll -h src/.libs/curl
+-rwxrwxrwx 1 root root 299K Jun 15 14:05 src/.libs/curl*
+```
