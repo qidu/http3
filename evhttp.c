@@ -84,6 +84,10 @@ int request_send(request_handler_t* rh, const char* url)
     const char *schema = evhttp_uri_get_scheme(uri);
     const char* path = evhttp_uri_get_path(uri);
     fprintf(stderr, "\nrequesting [%s %s %d %s]\n\n", schema, host, port, path);
+    if (uri == NULL || host == NULL || schema == NULL) {
+        fprintf(stderr, "invalid request\n");
+        return -1;
+    }
 
     if (strncmp(schema, "https", 5) == 0) {
         rh->ssl_ctx = SSL_CTX_new(SSLv23_client_method());
