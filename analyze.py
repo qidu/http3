@@ -1,3 +1,37 @@
+
+function getms {
+    t1s=$(date +%s)
+    t1m=$(date +%2N)
+    t1=$(($t1s%1000 + $t1m))
+    echo $t1
+    return $t1
+}
+
+function cubic_quic {
+    { time ./quic-go-perf-arm64-linux --upload-bytes=0k --download-bytes=2000k  --server-address=192.168.68.88:8099 >> r2m.txt 2>&1; } 2>> r2m.txt
+}
+
+function scp_tcp {
+    { time scp ./zyx teric@192.168.68.88:/tmp/zyx-$(date +%s) >> r2m.txt 2>&1; } 2>> r2m.txt
+}
+
+function bbr_quic {
+    { time ./quic-go-perf-arm64-linux --upload-bytes=0k --download-bytes=2000k --server-address=192.168.68.88:8088 --use-bbr >> r2m.txt 2>&1; } 2>>r2m.txt
+}
+
+while(true)
+    do ping -c 3 192.168.68.88  >> r2m.txt 2>&1;
+    echo >> r2m.txt
+    echo "==== test cubic quic" >> r2m.txt 2>&1;
+    $(cubic_quic)
+    ping -c 3 192.168.68.88  >> r2m.txt 2>&1;
+    echo >> r2m.txt                                                                     echo "==== test scp tcp" >> r2m.txt 2>&1;                                           $(scp_tcp)
+    ping -c 3 192.168.68.88 >> r2m.txt 2>&1;
+    echo >> r2m.txt
+    echo "==== test bbr quic" >> r2m.txt 2>&1;                                          $(bbr_quic)                                                                         ping -c 3 192.168.68.88 >> r2m.txt 2>&1;
+    tail r2m.txt;
+    sleep 10
+done
 # grep data
 # Plot line and average
 # create picture
