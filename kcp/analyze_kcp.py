@@ -32,5 +32,6 @@ plt.legend()
 plt.title('TCP vs KCP')
 plt.xlabel('Tests')
 plt.ylabel('Time(s)')
+
 #plt.show()
 plt.savefig('./testkcp.png')
