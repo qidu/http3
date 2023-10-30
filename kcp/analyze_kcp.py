@@ -29,4 +29,8 @@ for key, values in res.items():
     plt.plot(values, label=key)
 
 plt.legend()
-plt.show()
+plt.title('TCP vs KCP')
+plt.xlabel('Tests')
+plt.ylabel('Time(s)')
+#plt.show()
+plt.savefig('./testkcp.png')
