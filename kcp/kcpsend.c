@@ -14,7 +14,7 @@
 
 #include "ikcp.h"
 
-#define BUFFER_SIZE 50000
+#define BUFFER_SIZE 20000
 #define PACKET_SIZE 1400
 
 #define FILENAME "/tmp/filename"
@@ -96,9 +96,9 @@ int kcp_output(const char *buf, int len, ikcpcb *kcp, void *user)
         sent += packet_len;
         int ret = 0;
         do {
-            ret = sendto(handle->sockfd, buffer, packet_len, 0, (struct sockaddr *)&handle->server, sizeof(struct sockaddr_in));
+            ret = sendto(handle->sockfd, buffer, packet_len, MSG_CONFIRM, (struct sockaddr *)&handle->server, sizeof(struct sockaddr_in));
             if (ret == packet_len ) {
-                handle->net_total += ret;
+                handle->net_total += 1;
                 len -= packet_len;
             }
             else {
@@ -125,7 +125,7 @@ void timer_callback(evutil_socket_t fd, short events, void *arg)
 		}
 		else {
 			int ret = event_base_loopbreak(handle->base);
-			fprintf(stderr, "@ read total %d net %d  break %d\n", handle->total, handle->net_total, ret);
+			fprintf(stderr, "@ total read %d net %d  break %d\n", handle->total, handle->net_total, ret);
 		}
 	}
     handle->kcp->current = iclock();
@@ -204,11 +204,16 @@ int main(int argc, char* argv[])
   
     event_base_dispatch(handle.base);
     ikcp_send(handle.kcp, "bye", 3);
+    ikcp_send(handle.kcp, "bye", 3);
+    ikcp_send(handle.kcp, "bye", 3);
+    ikcp_send(handle.kcp, "bye", 3);
     ikcp_flush(handle.kcp);
 
     int ret = ikcp_waitsnd(handle.kcp);
     fprintf(stderr, "finish sending %d.\n", ret);
+    ikcp_update(handle.kcp, iclock());
     ikcp_flush(handle.kcp);
+    fprintf(stderr, "@ total read %d net %d \n", handle.total, handle.net_total);
     
     // 释放资源
     ikcp_release(handle.kcp);

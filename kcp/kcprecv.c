@@ -87,35 +87,44 @@ void do_receive(void *arg) {
     addr.sin_addr.s_addr = INADDR_ANY;
     while (1) {
         int n = recvfrom(sockfd, buffer, MAX_PACKET_SIZE, 0, (struct sockaddr *)&addr, &len);
-        if (n <= 0) {
-            usleep(10000);
+        if (n < 0) {
+            usleep(20000);
             continue;
-        } else {
-			handle->net_total += n;
+        } else if (n > 0) {
+			handle->net_total += 1;
 			memcpy(&handle->addr, &addr, sizeof(addr));
+        }
+        if (n >= 0) {
         	int input = ikcp_input(handle->kcp, buffer, n);
-            handle->kcp->current = iclock();
+                // handle->kcp->current = iclock();
+                ikcp_update(handle->kcp, iclock());
 	        ikcp_flush(handle->kcp);
             
             int peeksize = 0;
-            if (peeksize = ikcp_peeksize(handle->kcp), peeksize > 0) {
+            while (peeksize = ikcp_peeksize(handle->kcp), peeksize > 0) {
                 // 从KCP中接收数据
                 char recvBuffer[BUFFER_SIZE];
                 int recvlen = 0;
-                while(recvlen = ikcp_recv(handle->kcp, recvBuffer, BUFFER_SIZE), recvlen > 0) {
+                while(recvlen = ikcp_recv(handle->kcp, recvBuffer, BUFFER_SIZE), recvlen >= 0) {
                     handle->total += recvlen;
                     if (recvlen >= 3 && strncmp(&recvBuffer[recvlen - 3], "bye", 3) == 0) {
-                        fprintf(stderr, "kcp recv %d peak %d total kcp %d net %d    \n", recvlen, peeksize, handle->total, handle->net_total);
+                        fprintf(stderr, "kcp recv %d peak %d total kcp %d net %d   \n", recvlen, peeksize, handle->total, handle->net_total);
                         fprintf(stderr, "bye.\n");
                         return;
                     }
                     else {
 #ifdef DUMP_TO_FILE
                         fwrite(recvBuffer, 1, recvlen, handle->file);
+                        fflush(handle->file);
 #endif
                         fprintf(stderr, "kcp recv %d peak %d total kcp %d net %d ...\r", recvlen, peeksize, handle->total, handle->net_total);
+                        if (recvlen <= 1400 && recvlen > 0) {
+                        //    fprintf(stdout, "packet %d last three 0x%X%X%X vs 0x%X%X%X \n", recvlen, 0xFF & recvBuffer[recvlen-3], 0xFF & recvBuffer[recvlen-2], 0xFF & recvBuffer[recvlen-1], 'b', 'y', 'e');
+                        }
                     }
                 }
+                ikcp_update(handle->kcp, iclock());
+	        ikcp_flush(handle->kcp);
             }
         }
     }
@@ -169,9 +178,12 @@ int main(int argc, char* argv[])
     ikcp_setmtu(handle.kcp, 1400);
 
     do_receive(&handle);
+    ikcp_update(handle.kcp, iclock());
+    ikcp_flush(handle.kcp);
 
     ikcp_release(handle.kcp);
 #ifdef DUMP_TO_FILE    
+    fflush(file);
     fclose(file);
 #endif
     close(sockfd);
