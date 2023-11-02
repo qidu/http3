@@ -190,7 +190,7 @@ int main(int argc, char* argv[])
     struct timeval timer_interval = {0, 10000};
     event_add(timer_event, &timer_interval);
 	
-    handle.kcp = ikcp_create(0x11223344, 0, (void*)&handle);
+    handle.kcp = ikcp_create(0x11223344, 0, (void*)&handle); // Should she same conn id and key at other side
     handle.kcp->output = kcp_output;
     handle.kcp->stream = 1;
 
