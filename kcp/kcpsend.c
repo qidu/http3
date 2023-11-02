@@ -102,9 +102,10 @@ int kcp_output(const char *buf, int len, ikcpcb *kcp, void *user)
                 len -= packet_len;
             }
             else {
+                usleep(10000);
             //    fprintf(stderr, "net failed %d for packet %d\n", ret, packet_len);
             }
-        } while(len > 0);
+        } while(ret <= 0);
     }
 
     return 0;
