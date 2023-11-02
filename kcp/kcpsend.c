@@ -209,10 +209,13 @@ int main(int argc, char* argv[])
     ikcp_send(handle.kcp, "bye", 3);
     ikcp_flush(handle.kcp);
 
-    int ret = ikcp_waitsnd(handle.kcp);
-    fprintf(stderr, "finish sending %d.\n", ret);
-    ikcp_update(handle.kcp, iclock());
-    ikcp_flush(handle.kcp);
+    int ret = ikcp_waitsnd(handle.kcp); 
+    while (ret > 0) {
+        fprintf(stderr, "finish sending %d.\n", ret);
+        ikcp_update(handle.kcp, iclock());
+        ikcp_flush(handle.kcp);
+        ret -= 1;
+    }
     fprintf(stderr, "@ total read %d net %d \n", handle.total, handle.net_total);
     
     // 释放资源
