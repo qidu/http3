@@ -193,16 +193,10 @@ int main(int argc, char* argv[])
   
     event_base_dispatch(handle.base);
     ikcp_send(handle.kcp, "bye", 3);
+    ikcp_flush(handle.kcp);
 
-    // 发送结束标识
-    fprintf(stderr, "finish reading file, and wait sending.\n");
-
-    // 进入事件循环，直到所有数据发送完成
-    int ret = 0;
-    while ((ret = ikcp_waitsnd(handle.kcp)) > 0) {
-        event_base_dispatch(handle.base);
-    }
-    fprintf(stderr, "finish sending.\n");
+    int ret = ikcp_waitsnd(handle.kcp);
+    fprintf(stderr, "finish sending %d.\n", ret);
 
     
     // 释放资源
