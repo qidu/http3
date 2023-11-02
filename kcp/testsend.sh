@@ -4,5 +4,7 @@ function send() {
 
 while(true); 
     do send;
-    sleep 10; 
+    nc -N -l 12345 ;
+    tail result-send.log | grep "real"
+    sleep 5; 
 done

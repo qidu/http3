@@ -14,7 +14,7 @@
 
 #include "ikcp.h"
 
-#define BUFFER_SIZE 100000
+#define BUFFER_SIZE 50000
 #define PACKET_SIZE 1400
 
 #define FILENAME "/tmp/filename"

@@ -9,7 +9,7 @@
 
 #include "ikcp.h"
 
-#define BUFFER_SIZE 200000
+#define BUFFER_SIZE 300000
 #define MAX_PACKET_SIZE 1500
 #define FILENAME "/tmp/filename2"
 #define DUMP_TO_FILE
@@ -64,20 +64,19 @@ typedef struct {
     int total;
     int net_total;
     FILE *file;
-} Handle;
+} Session;
 
-Handle handle;
-pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+Session handle;
 
 // KCP回调函数
 int kcp_output(const char *buf, int len, ikcpcb *kcp, void *user) {
-    Handle *handle = (Handle *)user;
+    Session *handle = (Session *)user;
     int n = sendto(handle->sockfd, buf, len, 0, (struct sockaddr*)&handle->addr, sizeof(handle->addr));
     return 0;
 }
 
 void do_receive(void *arg) {
-    Handle *handle = (Handle *)arg;
+    Session *handle = (Session *)arg;
     int sockfd = handle->sockfd;
     char buffer[MAX_PACKET_SIZE];
     struct sockaddr_in addr;
