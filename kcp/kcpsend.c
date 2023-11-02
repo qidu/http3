@@ -74,14 +74,14 @@ typedef struct {
     struct event_base *base;
     int total;
     int net_total;
-} Handle; 
+} Session; 
 
-Handle handle;
+Session handle;
 
 // KCP回调函数，用于发送数据
 int kcp_output(const char *buf, int len, ikcpcb *kcp, void *user) 
 {
-    Handle *handle = (Handle *)user;
+    Session *handle = (Session *)user;
     handle->inbuffer -= len;  // total len bigger than inbuffer
 
     int sent = 0;
@@ -113,7 +113,7 @@ int kcp_output(const char *buf, int len, ikcpcb *kcp, void *user)
 // 定时器回调函数，用于触发KCP更新
 void timer_callback(evutil_socket_t fd, short events, void *arg)
 {
-    Handle *handle = (Handle *)arg;
+    Session *handle = (Session *)arg;
 	if (handle->inbuffer < 0) {
     	char buffer[BUFFER_SIZE];
     	handle->inbuffer = fread(buffer, 1, BUFFER_SIZE, handle->file);
@@ -123,7 +123,7 @@ void timer_callback(evutil_socket_t fd, short events, void *arg)
         	ikcp_send(handle->kcp, buffer, handle->inbuffer);
 		}
 		else {
-    		    int ret = event_base_loopbreak(handle->base);
+			int ret = event_base_loopbreak(handle->base);
 			fprintf(stderr, "@ read total %d net %d  break %d\n", handle->total, handle->net_total, ret);
 		}
 	}
@@ -134,7 +134,7 @@ void timer_callback(evutil_socket_t fd, short events, void *arg)
 void read_callback(evutil_socket_t sockfd, short event, void *arg) 
 {
     char buffer[BUFFER_SIZE];
-    Handle *handle = (Handle *)arg;
+    Session *handle = (Session *)arg;
     if (event & EV_READ) {
         socklen_t addr_len;
         ssize_t ret = recvfrom(handle->sockfd, buffer, sizeof(buffer), 1, (struct sockaddr *)&handle->server, &addr_len);
