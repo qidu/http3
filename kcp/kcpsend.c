@@ -73,6 +73,7 @@ typedef struct {
     struct sockaddr_in server;
     struct event_base *base;
     int total;
+    int net_total;
 } Handle; 
 
 Handle handle;
@@ -93,8 +94,17 @@ int kcp_output(const char *buf, int len, ikcpcb *kcp, void *user)
         }
         memcpy(buffer, buf + sent, packet_len);
         sent += packet_len;
-        sendto(handle->sockfd, buffer, packet_len, 0, (struct sockaddr *)&handle->server, sizeof(struct sockaddr_in));
-        len -= packet_len;
+        int ret = 0;
+        do {
+            ret = sendto(handle->sockfd, buffer, packet_len, 0, (struct sockaddr *)&handle->server, sizeof(struct sockaddr_in));
+            if (ret == packet_len ) {
+                handle->net_total += ret;
+                len -= packet_len;
+            }
+            else {
+            //    fprintf(stderr, "net failed %d for packet %d\n", ret, packet_len);
+            }
+        } while(len > 0);
     }
 
     return 0;
@@ -109,12 +119,12 @@ void timer_callback(evutil_socket_t fd, short events, void *arg)
     	handle->inbuffer = fread(buffer, 1, BUFFER_SIZE, handle->file);
 		if (handle->inbuffer > 0) {
         	handle->total += handle->inbuffer;
-        	fprintf(stderr, "@ read %d total %d ...\r", handle->inbuffer, handle->total);
+        	fprintf(stderr, "@ read %d total %d net %d ...\r", handle->inbuffer, handle->total, handle->net_total);
         	ikcp_send(handle->kcp, buffer, handle->inbuffer);
 		}
 		else {
-			fprintf(stderr, "@ read total %d\n", handle->total);
-    		event_base_loopbreak(handle->base);
+    		    int ret = event_base_loopbreak(handle->base);
+			fprintf(stderr, "@ read total %d net %d  break %d\n", handle->total, handle->net_total, ret);
 		}
 	}
     handle->kcp->current = iclock();
@@ -184,9 +194,9 @@ int main(int argc, char* argv[])
     handle.kcp->output = kcp_output;
     handle.kcp->stream = 1;
 
-    ikcp_wndsize(handle.kcp, 512, 512);
+    ikcp_wndsize(handle.kcp, 1024, 1024);
     ikcp_nodelay(handle.kcp, 0, 40, 0, 0);
-    //ikcp_nodelay(handle.kcp, 1, 10, 2, 1);
+    // ikcp_nodelay(handle.kcp, 1, 10, 2, 1);
     ikcp_setmtu(handle.kcp, 1400);
 
     handle.inbuffer = -1;
@@ -197,7 +207,7 @@ int main(int argc, char* argv[])
 
     int ret = ikcp_waitsnd(handle.kcp);
     fprintf(stderr, "finish sending %d.\n", ret);
-
+    ikcp_flush(handle.kcp);
     
     // 释放资源
     ikcp_release(handle.kcp);

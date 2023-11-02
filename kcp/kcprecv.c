@@ -166,7 +166,7 @@ int main(int argc, char* argv[])
     // 设置KCP参数
     ikcp_wndsize(handle.kcp, 2048, 2048);
     ikcp_nodelay(handle.kcp, 0, 40, 0, 0);
-    //ikcp_nodelay(handle.kcp, 1, 10, 2, 1);
+    // ikcp_nodelay(handle.kcp, 1, 10, 2, 1);
     ikcp_setmtu(handle.kcp, 1400);
 
     do_receive(&handle);
